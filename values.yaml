@@ -1,0 +1,40 @@
+tags:
+  historyserver: true
+  jupyterhub: true
+
+spark-cluster:
+  historyserver:
+    image:
+      repository: mwa4/ilab-noops-spark-history-server
+    pvc:
+      enablePVC: false
+    s3:
+      enableS3: true
+      enableIAM: false
+      secret: history-server-s3-secret
+      logDirectory: s3a://mwa4-spark-history/logs
+
+  livy:
+    env:
+      LIVY_SPARK_EVENT1LOG_ENABLED: {value: "true"}
+      LIVY_SPARK_EVENT1LOG_DIR: {value: "s3a://mwa4-spark-history/logs"}
+      LIVY_SPARK_HADOOP_FS_S3A_ACCESS_KEY:
+        valueFrom:
+          secretKeyRef:
+            name: history-server-s3-secret
+            key: aws-access-key
+      LIVY_SPARK_HADOOP_FS_S3A_SECRET_KEY:
+        valueFrom:
+          secretKeyRef:
+            name: history-server-s3-secret
+            key: aws-secret-key
+
+  jupyterhub:
+    # image-awaiter does not work for us - reason unknown
+    prePuller:
+      hook:
+        enabled: false
+    hub:
+      cookieSecret: '5c7e69bd7464a89c73c98d1d5b03d12495eeb4e45e56cecf24aef9549a530e0b'
+    proxy:
+      secretToken: '7f55b797654b88ccd5502e83332f5649136f65a055bc6d6402f28f1b0f030bad'
