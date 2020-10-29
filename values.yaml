@@ -5,7 +5,7 @@ tags:
 spark-cluster:
   historyserver:
     image:
-      repository: mwa4/ilab-noops-spark-history-server
+      repository: mwa4/spark-history-server
     pvc:
       enablePVC: false
     s3:
